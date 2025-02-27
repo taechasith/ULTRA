@@ -8,15 +8,29 @@ function Registration() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     if(password !== confirmPassword){
       alert("Passwords do not match");
       return;
     }
-    console.log("Register:", email, password);
-    alert("Registration successful (dummy).");
-    navigate('/');
+    try {
+      const response = await fetch('http://127.0.0.1:8000/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await response.json();
+      if (data.status === 'success') {
+        alert("Registration successful!");
+        navigate('/onboarding');
+      } else {
+        alert("Registration error");
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      alert("An error occurred during registration.");
+    }
   };
 
   return (
@@ -28,11 +42,9 @@ function Registration() {
         alignItems="center" 
         minHeight="100vh"
       >
-        {/* Header */}
         <Typography variant="h3" component="h1" gutterBottom>
           ULTRA Project Registration
         </Typography>
-        {/* Registration Form */}
         <form onSubmit={handleRegister}>
           <TextField 
             label="Email" 
@@ -70,7 +82,6 @@ function Registration() {
             Register
           </Button>
         </form>
-        {/* Login Link */}
         <Typography variant="body2" sx={{ marginTop: 2 }}>
           Already have an account?{' '}
           <Link href="/" onClick={() => navigate('/')}>

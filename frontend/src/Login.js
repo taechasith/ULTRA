@@ -7,12 +7,26 @@ function Login() {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Dummy authentication logic
-    console.log("Login:", email, password);
-    alert("Login successful (dummy).");
-    // You can add redirection or further logic here
+    try {
+      const response = await fetch('http://127.0.0.1:8000/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await response.json();
+      if (data.status === 'success') {
+        alert("Login successful!");
+        // Redirect to onboarding or dashboard as needed
+        navigate('/onboarding');
+      } else {
+        alert("Invalid credentials");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      alert("An error occurred during login.");
+    }
   };
 
   return (
@@ -24,11 +38,9 @@ function Login() {
         alignItems="center" 
         minHeight="100vh"
       >
-        {/* Header */}
         <Typography variant="h3" component="h1" gutterBottom>
           ULTRA Project Login
         </Typography>
-        {/* Login Form */}
         <form onSubmit={handleLogin}>
           <TextField 
             label="Email" 
@@ -57,7 +69,6 @@ function Login() {
             Login
           </Button>
         </form>
-        {/* Registration Link */}
         <Typography variant="body2" sx={{ marginTop: 2 }}>
           Don't have an account?{' '}
           <Link href="/register" onClick={() => navigate('/register')}>

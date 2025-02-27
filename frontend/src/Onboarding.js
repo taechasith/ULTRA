@@ -10,15 +10,13 @@ function Onboarding() {
   const [gender, setGender] = useState('');
   const [nationality, setNationality] = useState('');
 
-  // Example mental health questions (PHQ-9 style, simplified)
-  // We'll store each question's response in state
+  // Example mental health questions
   const [q1, setQ1] = useState(false);
   const [q2, setQ2] = useState(false);
   const [q3, setQ3] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // For now, just log the values
     const formData = {
       age,
       gender,
@@ -27,11 +25,20 @@ function Onboarding() {
       q2,
       q3,
     };
-    console.log('Onboarding Data:', formData);
-
-    // In a real app, you'd POST this data to your backend
-    alert('Onboarding Complete! (Data logged in console)');
-    navigate('/'); // redirect to login or next step
+    try {
+      const response = await fetch('http://127.0.0.1:8000/onboarding', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      const data = await response.json();
+      console.log("Onboarding response:", data);
+      alert("Onboarding complete!");
+      navigate('/'); // Redirect to login or dashboard
+    } catch (error) {
+      console.error("Onboarding error:", error);
+      alert("An error occurred during onboarding.");
+    }
   };
 
   return (
@@ -60,7 +67,6 @@ function Onboarding() {
             value={age}
             onChange={(e) => setAge(e.target.value)}
           />
-          {/* Gender Radio */}
           <FormControl component="fieldset" margin="normal">
             <FormLabel component="legend">Gender</FormLabel>
             <RadioGroup
